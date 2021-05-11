@@ -14,6 +14,7 @@ CurPath = r"/Users/aronj23/Desktop/py2app/"
 import os
 from os import path
 import shutil
+import zipfile as zf
 
 
 FilesTR = []
@@ -21,9 +22,7 @@ FilesTR = []
 for root, dirs, files in os.walk("/Users", topdown=False): # For every directory, file and root in the users directory:
    for name in files: # For every file that has a name:
        FilesTR += [os.path.join(root, name)] # Append the file name and path to the files list 
-for root, dirs, files in os.walk("/Users", topdown=False):
-   for name in files:
-       FilesTR += [os.path.join(root, name)]     
+    
        
        
 valid = []
@@ -51,7 +50,24 @@ for item in valid: # For every item in the valid list.
         print(valid[x]) # Print the item that caused an error
         y += 1 # Add 1 to the total amount of errors
     x +=1
-   
+    
+    
+    
+# Now lets zip!
+
+# I used this documentation here: https://docs.python.org/3/library/zipfile.html 
+FilesTZ = []
+
+for root, dirs, files in os.walk(CurPath + r"FindFiles/", topdown=False): # For every directory, file and root in the files directory:
+   for name in files: # For every file that has a name:
+       FilesTZ += [os.path.join(root, name)] # Append the file name and path to the files list 
+FilesTZ = list(dict.fromkeys(FilesTZ))
+with zf.ZipFile(CurPath + 'zipped.zip', "w") as myzip: # open a zipped file, create if it isn't 
+    for item in FilesTZ: # For every item in the filestz
+        myzip.write(item) # Write it to the zip file.
+
+
+
 # Now we start doing our specific files
 
     
