@@ -15,7 +15,8 @@ import os
 from os import path
 import shutil
 import zipfile as zf
-
+import _thread
+import time as t
 
 FilesTR = []
 # This code thanks to "shadow0359"
@@ -53,20 +54,22 @@ for item in valid: # For every item in the valid list.
     
     
     
-# Now lets zip!
-
+# Now lets zip! I make this a function so i can start it in a seporate thread!
+def ZipIt(threadName, Fin):
 # I used this documentation here: https://docs.python.org/3/library/zipfile.html 
-FilesTZ = []
+    FilesTZ = []
 
-for root, dirs, files in os.walk(CurPath + r"FindFiles/", topdown=False): # For every directory, file and root in the files directory:
-   for name in files: # For every file that has a name:
-       FilesTZ += [os.path.join(root, name)] # Append the file name and path to the files list 
-FilesTZ = list(dict.fromkeys(FilesTZ))
-with zf.ZipFile(CurPath + 'zipped.zip', "w") as myzip: # open a zipped file, create if it isn't 
-    for item in FilesTZ: # For every item in the filestz
-        myzip.write(item) # Write it to the zip file.
-
-
+    for root, dirs, files in os.walk(CurPath + r"FindFiles/", topdown=False): # For every directory, file and root in the files directory:
+        for name in files: # For every file that has a name:
+            FilesTZ += [os.path.join(root, name)] # Append the file name and path to the files list 
+    FilesTZ = list(dict.fromkeys(FilesTZ))
+    with zf.ZipFile(CurPath + 'zipped.zip', "w") as myzip: # open a zipped file, create if it isn't 
+        for item in FilesTZ: # For every item in the filestz
+            myzip.write(item) # Write it to the zip file.
+    Fin = True
+    print("Done Zipping!")
+# Now to start the thread
+_thread.start_new_thread(ZipIt,("Zip-Found-1",False,))
 
 # Now we start doing our specific files
 
