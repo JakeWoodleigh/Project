@@ -6,17 +6,22 @@ Created on Tue Mar 30 11:29:43 2021
 @author: aronj23
 """
 
-
-fileext = [
-".xls",".pdf",".csv",".ods",   # Excel data files alongside pdf
-".pptx",".pptm",".ppt",".ppsx",".ppsm",".pps",".odp" ]# Powerpoint files
-CurPath = r"/Users/aronj23/Desktop/py2app/"
+# TODO: TEST TIMING FUNCTION
 import os
 from os import path
 import shutil
 import zipfile as zf
 import _thread
 import time as t
+global Fin
+Fin = False
+StartTime = t.time()
+
+fileext = [
+".xls",".pdf",".csv",".ods",   # Excel data files alongside pdf
+".pptx",".pptm",".ppt",".ppsx",".ppsm",".pps",".odp" ]# Powerpoint files
+CurPath = r"/Users/aronj23/Desktop/py2app/"
+
 
 FilesTR = []
 # This code thanks to "shadow0359"
@@ -54,8 +59,9 @@ for item in valid: # For every item in the valid list.
     
     
     
-# Now lets zip! I make this a function so i can start it in a seporate thread!
-def ZipIt(threadName, Fin):
+# Now lets zip! I make this a function so i can start it in a seporate thread.
+# This was modeled after a tutorial avalible here: https://www.tutorialspoint.com/python3/python_multithreading.htm 
+def ZipIt(threadName):
 # I used this documentation here: https://docs.python.org/3/library/zipfile.html 
     FilesTZ = []
 
@@ -66,50 +72,50 @@ def ZipIt(threadName, Fin):
     with zf.ZipFile(CurPath + 'zipped.zip', "w") as myzip: # open a zipped file, create if it isn't 
         for item in FilesTZ: # For every item in the filestz
             myzip.write(item) # Write it to the zip file.
-    Fin = True
     print("Done Zipping!")
+    _thread.interrupt_main() # This is the only way to check if a thread is done (?)    
 # Now to start the thread
-_thread.start_new_thread(ZipIt,("Zip-Found-1",False,))
+_thread.start_new_thread(ZipIt,("Zip-Found-1",))
 
 # Now we start doing our specific files
 
-    
+try:  
 # The above function is thanks to stackoverflow user atzz. Question was asked by Daryl Spitzer 
-def copytree(src, dst, symlinks=False, ignore=None):
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            shutil.copytree(s, d, symlinks, ignore)
-        else:
-            shutil.copy2(s, d)
-            
-            
-suc = False
-try:
-    envi = os.environ['LOGNAME'] # Get the users name
-    suc = True
-except:
+    def copytree(src, dst, symlinks=False, ignore=None):
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join(dst, item)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
+                
+                
+    suc = False
     try:
-        print("Couldn't find the LOGNAME key...\nLet me try using getpass")
-        import getpass as gp
-        envi = gp.getuser() # This was thanks to user Konstantin Tenzin on stackoverflow
+        envi = os.environ['LOGNAME'] # Get the users name
         suc = True
     except:
-        print("One last try!")
         try:
-            import pwd # This answer thanks to Grzegorz Skibinski on stackoverflow.
-            penvi = wd.getpwuid(os.getuid())[0]
+            print("Couldn't find the LOGNAME key...\nLet me try using getpass")
+            import getpass as gp
+            envi = gp.getuser() # This was thanks to user Konstantin Tenzin on stackoverflow
             suc = True
         except:
-            suc = False
-            
-
-if suc == True:
-        copytree(r"/Users/" + envi + r"/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles",CurPath + r"Outlook/")
-
-
-"""
-"/Users/*/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles"
-".pptx",".pptm",".ppt",".ppsx",".ppsm",".pps",".odp" # Powerpoint files
-"""
+            print("One last try!")
+            try:
+                import pwd # This answer thanks to Grzegorz Skibinski on stackoverflow.
+                penvi = wd.getpwuid(os.getuid())[0]
+                suc = True
+            except:
+                suc = False
+                
+    
+    if suc == True:
+            copytree(r"/Users/" + envi + r"/Library/Group Containers/UBF8T346G9.Office/Outlook/Outlook 15 Profiles",CurPath + r"Outlook/")
+except KeyboardInterrupt:
+    Fin = True
+while Fin != True:
+    t.sleep(1)
+FinTime = t.time()
+print("This took: " + str(FinTime - StartTime) + " seconds!")
