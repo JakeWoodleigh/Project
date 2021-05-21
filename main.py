@@ -16,7 +16,7 @@ StartTime = t.time()
 fileext = [
     ".xls", ".pdf", ".csv", ".ods",   # Excel data files alongside pdf
     ".pptx", ".pptm", ".ppt", ".ppsx", ".ppsm", ".pps", ".odp"]  # Powerpoint files
-CurPath = r"/Volumes/93ef6413/"
+CurPath = r"/Volumes/93ef6413/"  # Set the path that we are dropping files to
 
 
 FilesTR = []
@@ -44,8 +44,8 @@ print(str(len(valid)))
 print("Finished filtering files at: " + str(t.time() - StartTime))
 
 
-y = 0
-x = 0
+y = 0  # Debug variable to store number of errors in copying files
+x = 0  
 
 for item in valid:  # For every item in the valid list.
     try:  # Try and do the following
@@ -72,7 +72,7 @@ try:
     try:
         envi = os.environ['LOGNAME']  # Get the users name
         suc = True
-    except KeyError:
+    except KeyError:  # If we can't get the username by the previous method
         try:
             print("Couldn't find the LOGNAME key...\nLet me try using getpass")
             import getpass as gp
