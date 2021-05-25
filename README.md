@@ -1,1 +1,1 @@
-Note: This runs on Python 3.8.3
+Note: The portable executable may NOT work on specific computers due to anti-virus measures.
